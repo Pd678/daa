@@ -1,43 +1,63 @@
-def n_queens(n):
-    col = set()
-    posDiag = set()  # (r + c)
-    negDiag = set()  # (r - c)
+# Python program to solve N Queen Problem using Backtracking
 
-    res = []
+N = 4
 
-    board = [["0"] * n for _ in range(n)]
-
-    def backtrack(r):
-        if r == n:
-            copy = [" ".join(row) for row in board]
-            res.append(copy)
-            return
-
-        for c in range(n):
-            if c in col or (r + c) in posDiag or (r - c) in negDiag:
-                continue
-
-            col.add(c)
-            posDiag.add(r + c)
-            negDiag.add(r - c)
-            board[r][c] = "1"
-
-            backtrack(r + 1)
-
-            col.remove(c)
-            posDiag.remove(r + c)
-            negDiag.remove(r - c)
-            board[r][c] = "0"
-
-    backtrack(0)
-
-    for sol in res:
-        for row in sol:
-            print(row)
+def printSolution(board):
+    for i in range(N):
+        for j in range(N):
+            print(board[i][j], end=" ")
         print()
 
+# Check if placing queen at (row, col) is safe
+def isSafe(board, row, col):
+    # Check left side in same row
+    for i in range(col):
+        if board[row][i] == 1:
+            return False
 
-if __name__ == "__main__":
-    n_queens(8)
+    # Check upper-left diagonal
+    i, j = row, col
+    while i >= 0 and j >= 0:
+        if board[i][j] == 1:
+            return False
+        i -= 1
+        j -= 1
 
+    # Check lower-left diagonal
+    i, j = row, col
+    while i < N and j >= 0:
+        if board[i][j] == 1:
+            return False
+        i += 1
+        j -= 1
 
+    return True
+
+def solveNQUtil(board, col):
+    # If all queens are placed
+    if col >= N:
+        return True
+
+    # Try placing queen in each row of current column
+    for i in range(N):
+        if isSafe(board, i, col):
+            board[i][col] = 1  # place queen
+
+            if solveNQUtil(board, col + 1):
+                return True
+
+            board[i][col] = 0  # backtrack
+
+    return False
+
+def solveNQ():
+    board = [[0 for _ in range(N)] for _ in range(N)]
+
+    if not solveNQUtil(board, 0):
+        print("Solution does not exist")
+        return
+
+    printSolution(board)
+
+# Driver Code
+solveNQ()
